@@ -1,3 +1,3 @@
 # Debt Collector 5000
 
-TL;DR: It shoots you until you swipe your credit card. (We can also process transactions with it, spoiler alert.)
+TL;DR: It shoots you (and only you, because we track it using a webcam) until you swipe your credit card. (We can also process transactions with it, but that's in the works...)
