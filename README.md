@@ -1,3 +1,3 @@
-# thing that shoots you until you pay it
+# Debt Collector 5000
 
-yes that's the whole thing. no there's nothing else. thank you.
+TL;DR: It shoots you until you swipe your credit card. (We can also process transactions with it, spoiler alert.)
