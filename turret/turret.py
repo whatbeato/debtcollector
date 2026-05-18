@@ -426,7 +426,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     def handle_swipe(card):
-        nava.play('../debt-collector.wav')
+        nava.play('C:\\Users\\nbltm\\Downloads\\GitHub\\debtcollector\\debt-collector.wav')
         def _run():
             run_amazon_purchase(card)
             reader.reset()
