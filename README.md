@@ -4,4 +4,6 @@ TL;DR: It shoots you (and only you, because we track it using a webcam) until yo
 
 ## Demo video
 
-![Demo](https://raw.githubusercontent.com/whatbeato/debtcollector/refs/heads/main/demo.mp4)
+https://github.com/user-attachments/assets/26df08ea-0169-446d-930a-bf110aafd448
+
+
