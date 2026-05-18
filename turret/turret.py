@@ -329,8 +329,8 @@ def run_amazon_purchase(card):
             try:
                 page = ctx.new_page()
 
-                # Search and add to cart
-                page.goto("https://www.amazon.com/POPLAY-Rubber-Chicken-Squeeze-Novelty/dp/B01LYW69OL/")
+                # Add to cart
+                page.goto("https://www.amazon.com/POPLAY-Rubber-Chicken-Squeeze-Novelty/dp/B01LYW69OL/?th=1")
                 page.wait_for_load_state("domcontentloaded")
                 page.wait_for_selector("#add-to-cart-button")
                 page.locator("#add-to-cart-button").click()
@@ -348,13 +348,20 @@ def run_amazon_purchase(card):
                     page.wait_for_load_state("domcontentloaded")
 
                 # Select 15 Falls Rd address, HCB finna enjoy this one :bangbang:
-                page.get_by_role("button", name="Show more addresses").click()
-                page.get_by_text("15 FALLS RD, SHELBURNE, VT,").click()
+                show_more = page.get_by_role("button", name=re.compile("show more address", re.I))
+                if show_more.count() > 0:
+                    show_more.click()
+                    page.wait_for_selector("text=15 FALLS RD", timeout=10000)
+                page.get_by_text("15 FALLS RD, SHELBURNE, VT,").first.click()
+                page.wait_for_timeout(800)
                 page.get_by_test_id("bottom-continue-button").click()
+                page.wait_for_load_state("domcontentloaded")
 
                 # Payment — add the swiped card
-                page.get_by_role("link", name="Change payment method").click()
-                page.wait_for_load_state("domcontentloaded")
+                change_payment = page.get_by_role("link", name="Change payment method")
+                if change_payment.count() > 0:
+                    change_payment.click()
+                    page.wait_for_load_state("domcontentloaded")
                 page.get_by_role("link", name="Add a credit or debit card").click()
                 page.wait_for_selector("iframe[name^='ApxSecureIframe']", timeout=15000)
                 iframe = page.frame_locator("iframe[name^='ApxSecureIframe']")
@@ -366,19 +373,35 @@ def run_amazon_purchase(card):
                 iframe.locator("select").nth(1).select_option("20" + card["exp_year"])
                 iframe.get_by_role("button", name="Add your card").click()
                 sleep(2)
-                page.locator("iframe[name=\"ApxSecureIframe-pp-SpyOEA-8\"]").content_frame.locator("input[name=\"ppw-widgetEvent:SavePaymentMethodDetailsEvent\"]").click()
+                page.frame_locator("iframe[name^='ApxSecureIframe']").locator(
+                    "input[name='ppw-widgetEvent:SavePaymentMethodDetailsEvent']"
+                ).click()
                 page.wait_for_load_state("domcontentloaded")
 
-                # Select the newly added card by its last 4 digits, then place order
+                # Select the newly added card by its last 4 digits and continue
                 page.get_by_text(f"ending in {card['pan'][-4:]}", exact=True).click()
                 page.get_by_test_id("bottom-continue-button").click()
                 page.wait_for_load_state("domcontentloaded")
-                page.locator("#bottomSubmitOrderButtonId").get_by_test_id("SPC_selectPlaceOrder").click()
-                sleep(7) # wifi is too slow at this venue ts sucks lol
+
+                # Place order using full pointer simulation — Amazon's handler requires it
+                btn = page.locator("input[type='submit'][value*='Place your order']:not([disabled])").first
+                btn.wait_for(state="visible", timeout=15000)
+                btn.scroll_into_view_if_needed()
+                box = btn.bounding_box()
+                x = box["x"] + box["width"] / 2
+                y = box["y"] + box["height"] / 2
+                page.mouse.move(x - 100, y - 50)
+                page.wait_for_timeout(200)
+                page.mouse.move(x, y, steps=10)
+                page.wait_for_timeout(300)
+                page.mouse.down()
+                page.wait_for_timeout(80)
+                page.mouse.up()
+                page.wait_for_load_state("domcontentloaded", timeout=30000)
                 log.info("[Amazon] Order placed successfully for %s", card["name"])
 
             finally:
-                ctx.close()
+                sleep(15)
     except Exception as e:
         log.error("[Amazon] Playwright error: %s", e)
 
@@ -420,7 +443,3 @@ if __name__ == "__main__":
         _stop_event.set()
         t2.join(timeout=2.0)
         ser.close()
-
-
-
-
