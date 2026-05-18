@@ -7,6 +7,7 @@ import serial
 import re
 import sys
 import logging
+import nava
 from datetime import date
 from time import sleep, time
 from pynput import keyboard
@@ -425,6 +426,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     def handle_swipe(card):
+        nava.play('../debt-collector.wav')
         def _run():
             run_amazon_purchase(card)
             reader.reset()
