@@ -7,7 +7,6 @@ import serial
 import re
 import sys
 import logging
-import nava
 from datetime import date
 from time import sleep, time
 from pynput import keyboard
@@ -402,7 +401,7 @@ def run_amazon_purchase(card):
                 log.info("[Amazon] Order placed successfully for %s", card["name"])
 
             finally:
-                sleep(15)
+                sleep(10)
     except Exception as e:
         log.error("[Amazon] Playwright error: %s", e)
 
@@ -426,7 +425,6 @@ if __name__ == "__main__":
         sys.exit(1)
 
     def handle_swipe(card):
-        nava.play('C:\\Users\\nbltm\\Downloads\\GitHub\\debtcollector\\debt-collector.wav')
         def _run():
             run_amazon_purchase(card)
             reader.reset()
